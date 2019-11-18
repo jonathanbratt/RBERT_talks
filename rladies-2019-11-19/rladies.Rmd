@@ -1,0 +1,920 @@
+---
+title: "RBERT: Cutting Edge NLP in R"
+author: "Jonathan Bratt & Jon Harmon"
+date: "2019-11-19"
+output: 
+  xaringan::moon_reader:
+    css: [default, hygge, robot-fonts]
+    seal: false
+    nature:
+      ratio: 16:9
+---
+
+name: title
+class: inverse, center, middle
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(
+  warning = FALSE, message = FALSE, fig.retina = 3, fig.width = 15
+)
+library(dplyr)
+library(RBERT)
+library(RBERTviz)
+```
+
+<img src="img/rbert_hex.png" width = "300px"/>
+
+## Cutting-Edge NLP in R
+
+.Large[Jonathan Bratt | R-Ladies Austin | 2019-11-19]
+
+---
+
+name: acknowledgement
+
+# RBERT Authors
+
+
+.pull-left[
+## Jonathan Bratt
+###github.com/jonathanbratt
+## Jon Harmon
+###github.com/jonthegeek
+##Macmillan Learning
+]
+
+.pull-right[
+
+![Jon Harmon](img/harmon-action.png)]
+
+---
+
+name: outline
+
+# Tonight
+
+.Large[
+
+* What's the big deal with BERT?
+* How can I use it in R?
+]
+
+---
+
+# Deep Learning
+
+.Large[
+
+* Very powerful, but...
+* Requires massive amounts of training data.
+]
+
+
+---
+
+# Transfer Learning: Computer Vision
+
+.pull-left[
+.Large[
+* Training task: Classify images (ImageNet: ~14M examples)
+]
+]
+
+---
+
+count: false
+
+# Transfer Learning: Computer Vision
+
+.pull-left[
+.Large[
+* Training task: Classify images (ImageNet: ~14M examples)
+* Early layers of the neural net: simple features
+]
+]
+
+<div width="50%">
+<p  style="padding-left:10">Credit: <a href="http://yosinski.com/deepvis">deepvis</a> by Jason Yosinski, Jeff Clune, Anh Nguyen, Thomas Fuchs, and Hod Lipson (2015)</p>
+<div width="50%" style="float:left">
+<img src="img/deep_viz/deep_viz_toolbox-dark_to_light.png" width="130px"\>
+</div>
+<div width="50%" style="float:right">
+</div>
+</div>
+
+---
+
+count: false
+
+# Transfer Learning: Computer Vision
+
+.pull-left[
+.Large[
+* Training task: Classify images (ImageNet: ~14M examples)
+* Early layers of the neural net: simple features
+]
+]
+
+<div width="50%">
+<p  style="padding-left:10">Credit: <a href="http://yosinski.com/deepvis">deepvis</a> by Jason Yosinski, Jeff Clune, Anh Nguyen, Thomas Fuchs, and Hod Lipson (2015)</p>
+<div width="50%" style="float:left">
+<img src="img/deep_viz/deep_viz_toolbox-dark_to_light.png" width="130px"\>
+<img src="img/deep_viz/deep_viz_toolbox-light_to_dark.png" width="130px"\>
+</div>
+<div width="50%" style="float:right">
+</div>
+</div>
+
+---
+
+count: false
+
+# Transfer Learning: Computer Vision
+
+.pull-left[
+.Large[
+* Training task: Classify images (ImageNet: ~14M examples)
+* Early layers of the neural net: simple features
+* Later layers: complex features
+]
+]
+ 
+<div width="50%">
+<p  style="padding-left:10">Credit: <a href="http://yosinski.com/deepvis">deepvis</a> by Jason Yosinski, Jeff Clune, Anh Nguyen, Thomas Fuchs, and Hod Lipson (2015)</p>
+<div width="50%" style="float:left">
+<img src="img/deep_viz/deep_viz_toolbox-dark_to_light.png" width="130px"\>
+<img src="img/deep_viz/deep_viz_toolbox-light_to_dark.png" width="130px"\>
+</div>
+<div width="50%" style="float:left; padding-left:20px">
+<img src="img/deep_viz/deep_viz_toolbox-faces.png" width="130px"\>
+</div>
+</div>
+
+---
+
+count: false
+
+# Transfer Learning: Computer Vision
+
+.pull-left[
+.Large[
+* Training task: Classify images (ImageNet: ~14M examples)
+* Early layers of the neural net: simple features
+* Later layers: complex features
+]
+]
+ 
+<div width="50%">
+<p  style="padding-left:10">Credit: <a href="http://yosinski.com/deepvis">deepvis</a> by Jason Yosinski, Jeff Clune, Anh Nguyen, Thomas Fuchs, and Hod Lipson (2015)</p>
+<div width="50%" style="float:left">
+<img src="img/deep_viz/deep_viz_toolbox-dark_to_light.png" width="130px"\>
+<img src="img/deep_viz/deep_viz_toolbox-light_to_dark.png" width="130px"\>
+</div>
+<div width="50%" style="float:left; padding-left:20px">
+<img src="img/deep_viz/deep_viz_toolbox-faces.png" width="130px"\>
+<img src="img/deep_viz/deep_viz_toolbox-text.png" width="130px"\>
+</div>
+</div>
+
+---
+
+count: false
+
+# Transfer Learning: Computer Vision
+
+.pull-left[
+.Large[
+* Training task: Classify images (ImageNet: ~14M examples)
+* Early layers of the neural net: simple features
+* Later layers: complex features
+* Features are broadly applicable: learned layers can be "transferred" to other models and other tasks.
+]
+]
+ 
+<div width="50%">
+<p  style="padding-left:10">Credit: <a href="http://yosinski.com/deepvis">deepvis</a> by Jason Yosinski, Jeff Clune, Anh Nguyen, Thomas Fuchs, and Hod Lipson (2015)</p>
+<div width="50%" style="float:left">
+<img src="img/deep_viz/deep_viz_toolbox-dark_to_light.png" width="130px"\>
+<img src="img/deep_viz/deep_viz_toolbox-light_to_dark.png" width="130px"\>
+</div>
+<div width="50%" style="float:left; padding-left:20px">
+<img src="img/deep_viz/deep_viz_toolbox-faces.png" width="130px"\>
+<img src="img/deep_viz/deep_viz_toolbox-text.png" width="130px"\>
+</div>
+</div>
+
+---
+
+
+
+# Transfer Learning: NLP
+
+.Large[
+* Prior to 2018: word embeddings
+  * word2vec (Google, 2013)
+  * GloVe (Stanford, 2014)
+  * fastText (Facebook, 2015)
+]
+
+---
+
+count: false
+
+# Transfer Learning: NLP
+
+.Large[
+* Prior to 2018: word embeddings
+  * word2vec (Google, 2013)
+  * GloVe (Stanford, 2014)
+  * fastText (Facebook, 2015)
+* Words become points in a high-dimensional vector space.
+  *  "king" − "man" ≅ "queen" − "woman"
+  *  "eat" − "ate" ≅ "see" − "saw"
+]
+
+---
+
+count: false
+
+# Transfer Learning: NLP
+
+.Large[
+* Prior to 2018: word embeddings
+  * word2vec (Google, 2013)
+  * GloVe (Stanford, 2014)
+  * fastText (Facebook, 2015)
+* Words become points in a high-dimensional vector space.
+  *  "king" − "man" ≅ "queen" − "woman"
+  *  "eat" − "ate" ≅ "see" − "saw"
+* Limitation: context-agnostic. Each word has *one* embedding vector.
+  * "I saw the branch on the bank."  
+  * "I saw the branch of the bank."
+]
+
+---
+
+count: false
+
+# Transfer Learning: NLP
+
+.Large[
+* Prior to 2018: word embeddings
+  * word2vec (Google, 2013)
+  * GloVe (Stanford, 2014)
+  * fastText (Facebook, 2015)
+* Words become points in a high-dimensional vector space.
+  *  "king" − "man" ≅ "queen" − "woman"
+  *  "eat" − "ate" ≅ "see" − "saw"
+* Limitation: context-agnostic. Each word has *one* embedding vector.
+  * "I saw the *branch* **on** the *bank*."  
+  * "I saw the *branch* **of** the *bank*."
+]
+<img src="img/branch-on-bank.png" width = "200px"/>
+<img src="img/branch-of-bank.png" width = "200px"/>
+
+
+---
+
+# BERT
+
+.Large[
+* **B**idirectional **E**ncoder **R**epresentations from **T**ransformers
+* Released October 11, 2018
+  * Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova from Google AI Language
+* Training tasks: masked word prediction, sentence pair classification
+* Multiple layers of "self-attention"
+* Context-dependent embedding vectors!
+]
+
+---
+
+# Package: RBERT
+
+.pull-left[
+.Large[
+* `install_github("jonathanbratt/RBERT")`
+* Implementation of BERT in R
+* Use for:
+  * Feature extraction (input text, output embeddings)
+  * Soon: fine-tuning
+]
+]
+
+.pull-right[
+<img src="img/rbert_hex.png" width="400px">
+]
+
+---
+
+# Package: RBERTviz
+
+.pull-left[
+.Large[
+* `install_github("jonathanbratt/RBERTviz")`
+* Visualize output of RBERT
+  * `visualize_attention`
+  * `display_pca`
+]
+]
+
+.pull-right[
+<img src="img/RBERTviz.png" width="400px">
+]
+
+---
+
+# Attention
+
+.pull-left[
+```{r attention, eval=FALSE}
+RBERT::download_BERT_checkpoint(
+  "bert_base_uncased"
+)
+RBERT::extract_features(
+  "I love tacos.",
+  model = "bert_base_uncased",
+  layer_indexes = 1:12,
+  features = "attention"
+)$attention %>%
+  RBERTviz::visualize_attention()
+```
+
+Based on Jesse Vig's [bertviz](https://github.com/jessevig/bertviz) tool.
+]
+.pull-right[
+<img src="img/attention/tacos.png", width="500px"/>
+]
+
+[Live demo](tacos_viz.html)
+
+---
+
+# Attention
+
+.Large[
+Sentences:
+
+* The chicken didn't cross the road because it was too tired.
+* The chicken didn't cross the road because it was too wide.
+* The dog fetched the ball. It was excited.
+* The dog fetched the ball. It was blue.
+]
+
+---
+
+count: false
+
+# Attention
+
+.Large[
+Sentences:
+
+* The **chicken** didn't cross the road because **it** was too **tired.**
+* The chicken didn't cross the **road** because **it** was too **wide.**
+* The **dog** fetched the ball. **It** was **excited.**
+* The dog fetched the **ball.** **It** was **blue.**
+]
+
+---
+
+# Attention
+
+<img src="img/attention/3_1-chicken_tired.png" width="250px">
+<img src="img/attention/3_1-chicken_wide.png" width="250px">
+<img src="img/attention/3_1-dog_excited.png" width="250px">
+<img src="img/attention/3_1-dog_blue.png" width="250px">
+
+.Large[Early layers: simple features (e.g. next word)]
+
+---
+
+# Attention
+
+.pull-left[
+<img src="img/attention/9_5-chicken_tired.png">
+]
+.pull-right[
+<img src="img/attention/9_5-chicken_wide.png">
+]
+
+
+.Large[Later layers: sophisticated features (e.g. pronoun resolution)]
+
+---
+
+count: false
+
+# Attention
+
+.pull-left[
+<img src="img/attention/9_5-chicken_tired.png">
+]
+.pull-right[
+<img src="img/attention/9_5-chicken_wide.png">
+]
+
+
+.Large[Later layers: sophisticated features (e.g. pronoun resolution)]
+
+---
+
+count: false
+
+# Attention
+
+.pull-left[
+<img src="img/attention/9_5-dog_excited.png">
+]
+.pull-right[
+<img src="img/attention/9_5-dog_blue.png">
+]
+
+
+.Large[Later layers: sophisticated features (e.g. pronoun resolution)]
+
+
+
+---
+
+# Token Embeddings
+
+.pull-left[
+.Large[
+From online survey, collected about 100 "train" sentences:
+
+* "I could train a motivated gorilla."
+* "I took the train to Chicago over Thanksgiving."
+* "I wish I could be trained in how to use a jackhammer."
+* "Trains are too noisy."
+]]
+
+.pull-right[
+```{r layer-outputs, eval=FALSE}
+trains_data <- readRDS("trains_data.rds") %>%
+  dplyr::mutate(
+    sequence_index = dplyr::row_number()
+  )
+
+trains_output <- RBERT::extract_features(
+  trains_data$sentence,
+  model = "bert_base_uncased",
+  layer_indexes = 0:12,
+  features = "output"
+)$output
+
+trains_output_labeled <- trains_output %>%
+  dplyr::left_join(
+    dplyr::select(
+      trains_data, 
+      sequence_index, label
+    ),
+    by = "sequence_index"
+  )
+```
+]
+
+```{r load-trains, include=FALSE}
+trains_output_labeled <- readRDS(here::here("data", "trains_output_labeled.rds"))
+projection_df <- trains_output_labeled %>% 
+  dplyr::filter(layer_index %in% c(0, 12))
+source(here::here("R", "display_pca_dev.R"), local = TRUE)
+```
+
+---
+
+# Token Embeddings
+
+.pull-left[
+```{r layer-0, fig.show="hide", include=FALSE}
+trains_output_labeled %>% 
+  dplyr::filter(
+    stringr::str_detect(token, "^train"),
+    layer_index == 0,
+    sequence_index %in% c(2, 16, 1, 3)
+  ) %>% 
+  display_pca_dev(
+    project_vectors = projection_df,
+    # color_field = "label",
+    disambiguate_tokens = FALSE
+  ) +
+  ggplot2::scale_y_continuous(limits = c(-20, 25), labels = NULL) +
+  ggplot2::scale_x_continuous(limits = c(-25, 20), labels = NULL)
+```
+```{r layer-0-ideal, eval=FALSE}
+trains_output_labeled %>% 
+  RBERTviz::display_pca(
+    token_filter = "^train",
+    layer_index = 0,
+    # Just show one example of each unique word
+    first_token_instance = TRUE
+  )
+```
+]
+
+.pull-right[
+```{r layer-0-plot, ref.label="layer-0", echo=FALSE, fig.width=7}
+
+```
+]
+
+---
+
+# Token Embeddings
+
+Layer 0 (initial vectors)
+
+```{r layer-0-labeled, echo=FALSE}
+trains_output_labeled %>% 
+  dplyr::filter(
+    stringr::str_detect(token, "^train"),
+    layer_index == 0
+  ) %>% 
+  display_pca_dev(
+    project_vectors = projection_df,
+    color_field = "label",
+    disambiguate_tokens = FALSE
+  ) +
+  ggplot2::scale_y_continuous(limits = c(-20, 25), labels = NULL) +
+  ggplot2::scale_x_continuous(limits = c(-25, 20), labels = NULL) +
+  ggplot2::theme(legend.position = "none")
+```
+---
+count: false
+
+# Token Embeddings
+
+Layer 1
+
+```{r layer-1, echo=FALSE}
+trains_output_labeled %>% 
+  dplyr::filter(
+    stringr::str_detect(token, "^train"),
+    layer_index == 1
+  ) %>% 
+  display_pca_dev(
+    project_vectors = projection_df,
+    color_field = "label",
+    disambiguate_tokens = FALSE
+  ) +
+  ggplot2::scale_y_continuous(limits = c(-20, 25), labels = NULL) +
+  ggplot2::scale_x_continuous(limits = c(-25, 20), labels = NULL) +
+  ggplot2::theme(legend.position = "none")
+```
+---
+count: false
+
+# Token Embeddings
+
+Layer 2
+
+```{r layer-2, echo=FALSE}
+trains_output_labeled %>% 
+  dplyr::filter(
+    stringr::str_detect(token, "^train"),
+    layer_index == 2
+  ) %>% 
+  display_pca_dev(
+    project_vectors = projection_df,
+    color_field = "label",
+    disambiguate_tokens = FALSE
+  ) +
+  ggplot2::scale_y_continuous(limits = c(-20, 25), labels = NULL) +
+  ggplot2::scale_x_continuous(limits = c(-25, 20), labels = NULL) +
+  ggplot2::theme(legend.position = "none")
+```
+---
+count: false
+
+# Token Embeddings
+
+Layer 3
+
+```{r layer-3, echo=FALSE}
+trains_output_labeled %>% 
+  dplyr::filter(
+    stringr::str_detect(token, "^train"),
+    layer_index == 3
+  ) %>% 
+  display_pca_dev(
+    project_vectors = projection_df,
+    color_field = "label",
+    disambiguate_tokens = FALSE
+  ) +
+  ggplot2::scale_y_continuous(limits = c(-20, 25), labels = NULL) +
+  ggplot2::scale_x_continuous(limits = c(-25, 20), labels = NULL) +
+  ggplot2::theme(legend.position = "none")
+```
+---
+count: false
+
+# Token Embeddings
+
+Layer 4
+
+```{r layer-4, echo=FALSE}
+trains_output_labeled %>% 
+  dplyr::filter(
+    stringr::str_detect(token, "^train"),
+    layer_index == 4
+  ) %>% 
+  display_pca_dev(
+    project_vectors = projection_df,
+    color_field = "label",
+    disambiguate_tokens = FALSE
+  ) +
+  ggplot2::scale_y_continuous(limits = c(-20, 25), labels = NULL) +
+  ggplot2::scale_x_continuous(limits = c(-25, 20), labels = NULL) +
+  ggplot2::theme(legend.position = "none")
+```
+---
+count: false
+
+# Token Embeddings
+
+Layer 5
+
+```{r layer-5, echo=FALSE}
+trains_output_labeled %>% 
+  dplyr::filter(
+    stringr::str_detect(token, "^train"),
+    layer_index == 5
+  ) %>% 
+  display_pca_dev(
+    project_vectors = projection_df,
+    color_field = "label",
+    disambiguate_tokens = FALSE
+  ) +
+  ggplot2::scale_y_continuous(limits = c(-20, 25), labels = NULL) +
+  ggplot2::scale_x_continuous(limits = c(-25, 20), labels = NULL) +
+  ggplot2::theme(legend.position = "none")
+```
+---
+count: false
+
+# Token Embeddings
+
+Layer 6
+
+```{r layer-6, echo=FALSE}
+trains_output_labeled %>% 
+  dplyr::filter(
+    stringr::str_detect(token, "^train"),
+    layer_index == 6
+  ) %>% 
+  display_pca_dev(
+    project_vectors = projection_df,
+    color_field = "label",
+    disambiguate_tokens = FALSE
+  ) +
+  ggplot2::scale_y_continuous(limits = c(-20, 25), labels = NULL) +
+  ggplot2::scale_x_continuous(limits = c(-25, 20), labels = NULL) +
+  ggplot2::theme(legend.position = "none")
+```
+---
+count: false
+
+# Token Embeddings
+
+Layer 7
+
+```{r layer-7, echo=FALSE}
+trains_output_labeled %>% 
+  dplyr::filter(
+    stringr::str_detect(token, "^train"),
+    layer_index == 7
+  ) %>% 
+  display_pca_dev(
+    project_vectors = projection_df,
+    color_field = "label",
+    disambiguate_tokens = FALSE
+  ) +
+  ggplot2::scale_y_continuous(limits = c(-20, 25), labels = NULL) +
+  ggplot2::scale_x_continuous(limits = c(-25, 20), labels = NULL) +
+  ggplot2::theme(legend.position = "none")
+```
+---
+count: false
+
+# Token Embeddings
+
+Layer 8
+
+```{r layer-8, echo=FALSE}
+trains_output_labeled %>% 
+  dplyr::filter(
+    stringr::str_detect(token, "^train"),
+    layer_index == 8
+  ) %>% 
+  display_pca_dev(
+    project_vectors = projection_df,
+    color_field = "label",
+    disambiguate_tokens = FALSE
+  ) +
+  ggplot2::scale_y_continuous(limits = c(-20, 25), labels = NULL) +
+  ggplot2::scale_x_continuous(limits = c(-25, 20), labels = NULL) +
+  ggplot2::theme(legend.position = "none")
+```
+---
+count: false
+
+# Token Embeddings
+
+Layer 9
+
+```{r layer-9, echo=FALSE}
+trains_output_labeled %>% 
+  dplyr::filter(
+    stringr::str_detect(token, "^train"),
+    layer_index == 9
+  ) %>% 
+  display_pca_dev(
+    project_vectors = projection_df,
+    color_field = "label",
+    disambiguate_tokens = FALSE
+  ) +
+  ggplot2::scale_y_continuous(limits = c(-20, 25), labels = NULL) +
+  ggplot2::scale_x_continuous(limits = c(-25, 20), labels = NULL) +
+  ggplot2::theme(legend.position = "none")
+```
+---
+count: false
+
+# Token Embeddings
+
+Layer 10
+
+```{r layer-10, echo=FALSE}
+trains_output_labeled %>% 
+  dplyr::filter(
+    stringr::str_detect(token, "^train"),
+    layer_index == 10
+  ) %>% 
+  display_pca_dev(
+    project_vectors = projection_df,
+    color_field = "label",
+    disambiguate_tokens = FALSE
+  ) +
+  ggplot2::scale_y_continuous(limits = c(-20, 25), labels = NULL) +
+  ggplot2::scale_x_continuous(limits = c(-25, 20), labels = NULL) +
+  ggplot2::theme(legend.position = "none")
+```
+---
+count: false
+
+# Token Embeddings
+
+Layer 11
+
+```{r layer-11, echo=FALSE}
+trains_output_labeled %>% 
+  dplyr::filter(
+    stringr::str_detect(token, "^train"),
+    layer_index == 11
+  ) %>% 
+  display_pca_dev(
+    project_vectors = projection_df,
+    color_field = "label",
+    disambiguate_tokens = FALSE
+  ) +
+  ggplot2::scale_y_continuous(limits = c(-20, 25), labels = NULL) +
+  ggplot2::scale_x_continuous(limits = c(-25, 20), labels = NULL) +
+  ggplot2::theme(legend.position = "none")
+```
+---
+count: false
+
+# Token Embeddings
+
+wait a minute...
+
+```{r highlight-bad, echo=FALSE}
+trains_output_labeled %>% 
+  dplyr::filter(
+    stringr::str_detect(token, "^train"),
+    layer_index == 11
+  ) %>% 
+  display_pca_dev(
+    project_vectors = projection_df,
+    color_field = "label",
+    disambiguate_tokens = FALSE
+  ) +
+  ggplot2::scale_y_continuous(limits = c(-20, 25), labels = NULL) +
+  ggplot2::scale_x_continuous(limits = c(-25, 20), labels = NULL) +
+  ggplot2::theme(legend.position = "none") + 
+  ggplot2::geom_point(
+    data = data.frame(x = 8.2, y = -1.2),
+    mapping = ggplot2::aes(x = x, y = y),
+    color = "red",
+    size = 14,
+    shape = 1,
+    inherit.aes = FALSE
+  )
+```
+---
+count: false
+
+# Token Embeddings
+
+wait a minute...
+
+```{r highlight-bad2, echo=FALSE}
+trains_output_labeled %>% 
+  dplyr::filter(
+    stringr::str_detect(token, "^train"),
+    layer_index == 11
+  ) %>% 
+  display_pca_dev(
+    project_vectors = projection_df,
+    color_field = "label",
+    disambiguate_tokens = FALSE
+  ) +
+  ggplot2::scale_y_continuous(limits = c(-20, 25), labels = NULL) +
+  ggplot2::scale_x_continuous(limits = c(-25, 20), labels = NULL) +
+  ggplot2::theme(legend.position = "none") + 
+  ggplot2::geom_point(
+    data = data.frame(x = 8.2, y = -1.2),
+    mapping = ggplot2::aes(x = x, y = y),
+    color = "red",
+    size = 14,
+    shape = 1,
+    inherit.aes = FALSE
+  ) + 
+  ggplot2::annotate(
+    "text",
+    x = -3, y = -1.75,
+    label = '"train your vehicle with travelling"',
+    size = 10
+  )
+```
+---
+
+# To Do
+
+.Large[
+* RBERT is usable *now*...
+]
+
+---
+count: false
+
+# To Do
+
+.Large[
+* RBERT is usable *now*...
+* ...but it can be *better!*
+]
+
+---
+count: false
+
+# To Do
+
+.Large[
+* RBERT is usable *now*...
+* ...but it can be *better!*
+* Goal: CRAN by end of 2019
+]
+
+---
+count: false
+
+# To Do
+
+.Large[
+* RBERT is usable *now*...
+* ...but it can be *better!*
+* Goal: CRAN by end of 2019
+  * TensorFlow 2.0 
+  * More Rtful, less pythonic
+  * Recipe: `step_bert_features()`
+]
+
+---
+count: false
+
+# To Do
+
+.Large[
+* RBERT is usable *now*...
+* ...but it can be *better!*
+* Goal: CRAN by end of 2019
+  * TensorFlow 2.0 
+  * More Rtful, less pythonic
+  * Recipe: `step_bert_features()`
+* `rstudio::conf(2020L)` e-poster
+]
+
+---
+
+# Contact
+
+.Large[
+* [github.com/jonathanbratt/RBERT](github.com/jonathanbratt/RBERT)
+* [github.com/jonathanbratt/RBERTviz](github.com/jonathanbratt/RBERTviz)
+* [github.com/jonthegeek](github.com/jonthegeek)
+* Twitter: [@jonthegeek](https://twitter.com/JonTheGeek)
+* R4DS Online Learning Community: [r4ds.online](r4ds.online)
+* TidyTuesday Podcast: [tidytuesday.com](tidytuesday.com)
+
+]
