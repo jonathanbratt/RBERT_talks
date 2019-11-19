@@ -51,7 +51,7 @@ name: outline
 
 .Large[
 
-* What's the big deal with BERT?
+* What's BERT?
 * How can I use it in R?
 ]
 
@@ -60,9 +60,8 @@ name: outline
 # Deep Learning
 
 .Large[
-
-* Very powerful, but...
-* Requires massive amounts of training data.
+* Very powerful, but requires massive amounts of training data.
+* *Transfer learning* can help.
 ]
 
 
@@ -223,7 +222,7 @@ count: false
   * word2vec (Google, 2013)
   * GloVe (Stanford, 2014)
   * fastText (Facebook, 2015)
-* Words become points in a high-dimensional vector space.
+* Words are points in a high-dimensional vector space.
   *  "king" − "man" ≅ "queen" − "woman"
   *  "eat" − "ate" ≅ "see" − "saw"
 ]
@@ -239,12 +238,12 @@ count: false
   * word2vec (Google, 2013)
   * GloVe (Stanford, 2014)
   * fastText (Facebook, 2015)
-* Words become points in a high-dimensional vector space.
+* Words are points in a high-dimensional vector space.
   *  "king" − "man" ≅ "queen" − "woman"
   *  "eat" − "ate" ≅ "see" − "saw"
 * Limitation: context-agnostic. Each word has *one* embedding vector.
-  * "I saw the branch on the bank."  
-  * "I saw the branch of the bank."
+  * "I saw a branch on the bank."  
+  * "I saw a branch of the bank."
 ]
 
 ---
@@ -258,15 +257,15 @@ count: false
   * word2vec (Google, 2013)
   * GloVe (Stanford, 2014)
   * fastText (Facebook, 2015)
-* Words become points in a high-dimensional vector space.
+* Words are points in a high-dimensional vector space.
   *  "king" − "man" ≅ "queen" − "woman"
   *  "eat" − "ate" ≅ "see" − "saw"
 * Limitation: context-agnostic. Each word has *one* embedding vector.
-  * "I saw the *branch* **on** the *bank*."  
-  * "I saw the *branch* **of** the *bank*."
+  * "I saw a *branch* **on** the *bank*."  
+  * "I saw a *branch* **of** the *bank*."
 ]
-&lt;img src="img/branch-on-bank.png" width = "200px"/&gt;
-&lt;img src="img/branch-of-bank.png" width = "200px"/&gt;
+&lt;img src="img/branch-on-bank.png" width = "220px"/&gt;
+&lt;img src="img/branch-of-bank.png" width = "220px"/&gt;
 
 
 ---
@@ -275,12 +274,12 @@ count: false
 
 .Large[
 * **B**idirectional **E**ncoder **R**epresentations from **T**ransformers
-* Released October 11, 2018
-  * Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova from Google AI Language
+* Released October 11, 2018 by Google AI Language team
 * Training tasks: masked word prediction, sentence pair classification
-* Multiple layers of "self-attention"
-* Context-dependent embedding vectors!
+* **Structure: multiple layers of "self-attention"**
+* **Output: context-dependent embedding vectors**
 ]
+
 
 ---
 
@@ -291,6 +290,7 @@ count: false
 * `install_github("jonathanbratt/RBERT")`
 * Implementation of BERT in R
 * Use for:
+  * Running pre-trained BERT models
   * Feature extraction (input text, output embeddings)
   * Soon: fine-tuning
 ]
@@ -307,7 +307,7 @@ count: false
 .pull-left[
 .Large[
 * `install_github("jonathanbratt/RBERTviz")`
-* Visualize output of RBERT
+* For visualizing output from RBERT
   * `visualize_attention`
   * `display_pca`
 ]
@@ -391,7 +391,6 @@ Sentences:
 &lt;img src="img/attention/9_5-chicken_tired.png"&gt;
 ]
 .pull-right[
-&lt;img src="img/attention/9_5-chicken_wide.png"&gt;
 ]
 
 
