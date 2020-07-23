@@ -346,7 +346,7 @@ Based on Jesse Vig's [bertviz](https://github.com/jessevig/bertviz) tool.
 <img src="img/attention/tacos.png", width="500px"/>
 ]
 
-[Live demo](tacos_viz.html)
+[Live demo](sample_attention.html)
 
 ---
 
