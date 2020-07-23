@@ -474,10 +474,10 @@ trains_output_labeled <- trains_output %>%
 ]
 
 ```{r load-trains, include=FALSE}
-trains_output_labeled <- readRDS(here::here("data", "trains_output_labeled.rds"))
+trains_output_labeled <- readRDS(here::here("../data", "trains_output_labeled.rds"))
 projection_df <- trains_output_labeled %>% 
   dplyr::filter(layer_index %in% c(0, 12))
-source(here::here("R", "display_pca_dev.R"), local = TRUE)
+source(here::here("../R", "display_pca_dev.R"), local = TRUE)
 ```
 
 ---
